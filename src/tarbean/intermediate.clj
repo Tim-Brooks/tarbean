@@ -1,9 +1,11 @@
 (ns tarbean.intermediate
-  (:require [clojure.walk :refer [postwalk walk]]))
+  (:require [clojure.walk :refer [postwalk prewalk walk prewalk-replace]]))
 
-(defn node
-  [name]
-  (with-meta (fn [] (symbol (str name))) {:node true}))
+
+(defmacro node [name]
+  {:name name
+   :type :node
+   :symbol `(fn [] (symbol (str ~name)))})
 
 (def example-num-node
   {:name "1"
@@ -40,8 +42,19 @@
     :value 8
     :leaf true}])
 
-(defn tester [condition]
-  (walk (fn [x] (println x) (if (coll? x) (filter #(= (type %)
-                                                     (type (node "1"))) x) '()))
-        identity
-        condition))
+(defn walk-func [x]
+  )
+
+(defn tester [form]
+  (let [nodes (atom {})]
+    (prewalk (fn [x]
+               (if (and (map? x) (= :node (:type x)))
+                 (let [node-id (keyword (str "node-" (:name x)))]
+                   (do (swap! nodes  assoc node-id (:symbol x))
+                       node-id))
+                 x))
+             `(fn [input]
+                (if (<= (get input "CAT") 17.5)
+                  ~(node 2)
+                  ~(node 3))))
+    @nodes))

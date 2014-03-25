@@ -18,14 +18,14 @@
   (nextNode [_ _] nil))
 
 (defn generate-branch-node
-  [condition children]
+  [name condition children]
   (let [children->symbols (into {} (map (fn [[k v]] {k (-> v str symbol)}) children))
         child-nodes (map (fn [c] (with-meta
                                   c
                                   {:unsynchronized-mutable true}))
                          (vals children->symbols))
         condition-with-symbols (postwalk-replace children->symbols condition)
-        type-name (symbol (str "Branch" (count children)))]
+        type-name (symbol (str "Branch" name))]
     `(deftype ~type-name [name# value# ~@child-nodes]
        INode
        (isLeaf [_] false)
@@ -33,15 +33,14 @@
        (getValue [_] value#)
        (nextNode [_ features#] (~condition-with-symbols features#)))))
 
-(defn resolve-children [branch-map]
-  (let [children-count:branches (group-by (fn [x] (:child-count x)) branch-map)]
-    ))
+(defn resolve-children [condition]
+  nil)
 
 (defmacro build-tree [raw-tree]
   (let [branch-maps (filter #(not (:leaf %)) (var-get (resolve raw-tree)))]
     (cons `do
           (for [b branch-maps]
-            (generate-branch-node (:condition b) {})))))
+            (generate-branch-node (:name b) (:condition b) {})))))
 
 (build-tree example-schema)
 
