@@ -28,21 +28,21 @@
 
 (def example-cat-node
   [{:name "2"
-     :value nil
-     :leaf false
-     :condition  (condition [input]
-                            (get {"1" {:name 3 :type :node}
-                                  "2" {:name 4 :type :node}}
-                                 input
-                        '         {:name 3 :type :node}))}
-  {:name "3"
-     :value nil
-     :leaf false
-     :condition  (condition [input]
-                            (get {"1" {:name 5 :type :node}
-                                  "2" {:name 6 :type :node}})
-                                 input
-                                 {:name 6 :type :node})}])
+    :value nil
+    :leaf false
+    :condition  (condition [input]
+                           (get {"1" {:name 3 :type :node}
+                                 "2" {:name 4 :type :node}}
+                                input
+                                {:name 3 :type :node}))}
+   {:name "3"
+    :value nil
+    :leaf false
+    :condition  (condition [input]
+                           (get {"1" {:name 5 :type :node}
+                                 "2" {:name 6 :type :node}})
+                           input
+                           {:name 6 :type :node})}])
 
 (def example-schema
   [{:name "1"
