@@ -13,36 +13,38 @@
   [args & form]
   `'(fn ~args ~@form))
 
-(println (condition [input]
-                      (if (<= (get input "CAT") 17.5)
-                        {:name 2 :type :node}
-                        {:name 3 :type :node})))
-
-(def example-num-node
-  {:name "1"
-   :value nil
-   :condition '(fn [input]
-                 (if (<= (get input "CAT") 17.5)
-                   :2
-                   :3))})
-
-(def example-cat-node
-  [{:name "2"
-    :value nil
+(def example-tree
+  [{:id "1"
+    :leaf false
+    :condition (condition [input]
+                          (get {"Tim" {:id "2" :type :node}
+                                "Kvothe" {:id "3" :type :node}}
+                               (get input "name" "Tim")))}
+   {:id "2"
     :leaf false
     :condition  (condition [input]
-                           (get {"1" {:name 3 :type :node}
-                                 "2" {:name 4 :type :node}}
-                                input
-                                {:name 3 :type :node}))}
-   {:name "3"
-    :value nil
+                           (get {1 {:id "4" :type :node}
+                                 2 {:id "5" :type :node}
+                                 3 {:id "6" :type :node}}
+                                (get  input "hands" 1)))}
+   {:id "3"
     :leaf false
     :condition  (condition [input]
-                           (get {"1" {:name 5 :type :node}
-                                 "2" {:name 6 :type :node}})
-                           input
-                           {:name 6 :type :node})}])
+                           (if (> (get input "amount" 20) 15)
+                             {:id "5" :type :node}
+                             {:id "7" :type :node}))}
+   {:id "4"
+    :leaf true
+    :value "California"}
+   {:id "5"
+    :leaf true
+    :value "Missouri"}
+   {:id "6"
+    :leaf true
+    :value "Imre"}
+   {:id "7"
+    :leaf true
+    :value "Severen"}])
 
 (def example-schema
   [{:name "1"
