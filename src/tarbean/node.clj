@@ -74,20 +74,33 @@
 (defn- instantiate-leaf [{:keys [id value]}]
   `{~id {:instance (->LeafNode ~id ~value)}})
 
-(defn- construct-tree [node-map]
-  #_(doseq [{:keys [instance]} (vals node-map)])
-  node-map)
+(defn- construct-tree [root-id node-map]
+  (do
+     (doseq [{:keys [instance children]} (vals node-map)]
+       (when-let [child-instances (map #(-> (get node-map %) :instance)
+                                       children)]
+         (.setChildNodes ^INode instance child-instances)))
+     (get-in node-map [root-id :instance])))
 
 (defmacro build-tree [raw-tree]
   (let [tree-var (var-get (resolve raw-tree))
+        root-id (:id (first (filter :root tree-var)))
         branch-maps (filter #(not (:leaf %)) tree-var)
         leaf-maps# (filter :leaf tree-var)
         branches# (build-branches branch-maps)]
     `(do
        ~@(map #(nth % 0) branches#)
-       (construct-tree ~(merge (into {} (map #(instantiate-branch (nth % 1))
+       (construct-tree ~root-id
+                       ~(merge (into {} (map #(instantiate-branch (nth % 1))
                                              branches#))
                                (into {} (map instantiate-leaf leaf-maps#)))))))
 
-(build-tree intermediate/example-tree)
+
+(defn result [tree features]
+  (loop [^INode current-node tree]
+    (if (.isLeaf current-node)
+      (.getValue current-node)
+      (recur (.nextNode current-node features)))))
+
+(def a (build-tree intermediate/example-tree))
 

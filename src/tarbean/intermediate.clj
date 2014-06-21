@@ -15,18 +15,21 @@
 
 (def example-tree
   [{:id "1"
+    :root true
     :leaf false
     :condition (condition [input]
                           (get {"Tim" {:id "2" :type :node}
                                 "Kvothe" {:id "3" :type :node}}
-                               (get input "name" "Tim")))}
+                               (get input "name")
+                               {:id "3" :type :node}))}
    {:id "2"
     :leaf false
     :condition  (condition [input]
                            (get {1 {:id "4" :type :node}
                                  2 {:id "5" :type :node}
                                  3 {:id "6" :type :node}}
-                                (get  input "hands" 1)))}
+                                (get input "hands")
+                                {:id "5" :type :node}))}
    {:id "3"
     :leaf false
     :condition  (condition [input]
